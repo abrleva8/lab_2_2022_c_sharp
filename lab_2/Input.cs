@@ -24,12 +24,19 @@
             return num;
         }
 
-        public static Data getData() {
+        /*public static Data getData() {
             Console.WriteLine("Enter a string for encoding or decoding");
             string? str = Console.ReadLine();
             Console.WriteLine("Enter the key");
             int key = Input.GetNumber();
             return new Data(str, key);
+        }*/
+
+        public static string? getString() {
+           Console.WriteLine("Enter a string for encoding or decoding");
+           string? str = Console.ReadLine();
+           return str;
         }
+
     }
 }

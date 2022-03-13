@@ -12,10 +12,10 @@ namespace lab_2.Tests {
         [TestMethod()]
         public void EncodeTest() {
             string str = "abcde";
-            int key = 1;
+            Data data = new Data(str, 1);
             string rightAnswer = "bcdef";
             CaesarСipher caesarСipher = new CaesarСipher();
-            string methodAnswer = caesarСipher.Encode(str, key);
+            string methodAnswer = caesarСipher.Encode(data);
             Assert.AreEqual(methodAnswer, rightAnswer);
         }
     }

@@ -44,8 +44,7 @@ namespace lab_2 {
             Console.WriteLine("");
             Console.WriteLine("Enter 1 to encode data");
             Console.WriteLine("Enter 2 to decode data");
-            Console.WriteLine("Enter 3 to save encoding data");
-            Console.WriteLine("Enter 4 to save decoding data");
+            Console.WriteLine("Enter 3 to save result");
             Console.WriteLine("Enter 0 to back.");
         }
 
@@ -63,27 +62,29 @@ namespace lab_2 {
                 CipherOperationChoice cipherOperationChoice = (CipherOperationChoice) Input.GetNumber();
                 switch (cipherOperationChoice) {
                     case CipherOperationChoice.Back:
-                        Console.WriteLine("The data will be lost!");
                         isRestart = false;
                         break;
                     case CipherOperationChoice.Encode: {
-                        Console.WriteLine(cipher.Encode(data));
+                        string result = cipher.Encode(data);
+                        Console.WriteLine($"The result is {result}");
                         break;
                     }
-                    case CipherOperationChoice.Decode:
-                        //Console.WriteLine("Enter number to delete from the tree");
+                    case CipherOperationChoice.Decode: {
+                        string result = cipher.Decode(data);
+                        Console.WriteLine($"The result is {result}");
                         break;
+                    }
                     case CipherOperationChoice.SaveResult:
                         break;
                     default:
-                        Console.WriteLine("Please, enter a number between" +
+                        Console.WriteLine("Please, enter a number between " +
                                                  $"{(int) CipherOperationChoice.Back} and {(int) CipherOperationChoice.SaveResult}");
                         break;
                 }
             } while (isRestart);
         }
 
-        public void CipherChoiceInterface(Data data) {
+        public void CipherChoiceInterface(string? str) {
             bool isRestart = true;
             do {
                 PrintMenuForChoice();
@@ -98,10 +99,10 @@ namespace lab_2 {
                         break;
                     case CipherChoice.Caesar:
                         cipher = new CaesarСipher();
-                        CipherOperationInterface(cipher, data);
+                        //CipherOperationInterface(cipher, data);
                         break;
                     default:
-                        Console.WriteLine("Please, enter a number between" +
+                        Console.WriteLine("Please, enter a number between " +
                                           $"{(int) CipherChoice.Back} and {(int) CipherChoice.Caesar}");
                         continue;
 
@@ -109,6 +110,7 @@ namespace lab_2 {
                 }
             } while (isRestart);
         }
+        
         public void InterfaceMenu() {
             bool isRestart = true;
             do {
@@ -121,18 +123,23 @@ namespace lab_2 {
                         isRestart = false;
                         break;
 
-                    case MenuChoices.Console:
+                    case MenuChoices.Console: {
                         Console.WriteLine("Your choice is CONSOLE");
-                        Data data = Input.getData();
-                        CipherChoiceInterface(data);
+                        string? str = Input.getString();
+                        CipherChoiceInterface(str);
+                    }
                         break;
 
                     case MenuChoices.Files:
                         Console.WriteLine("Your choice is FILES");
                         break;
 
-                    case MenuChoices.Random:
+                    case MenuChoices.Random: {
                         Console.WriteLine("Your choice is RANDOM");
+                        string? str = Data.GetRandomString();
+                        Console.WriteLine(str);
+                        CipherChoiceInterface(str);
+                    }
                         break;
                     default:
                         Console.WriteLine($"Please, enter a number between {(int) MenuChoices.Exit} and {(int) MenuChoices.Random}");
