@@ -3,9 +3,9 @@
 namespace lab_2 {
     public class Data {
         private string str;
-        private int key;
+        private string key;
 
-        public int Key {
+        public string Key {
             get {
                 return this.key;
             }
@@ -25,34 +25,28 @@ namespace lab_2 {
             }
         }
 
-        public Data(string str, int key) {
+        public Data(string str, string key) {
             this.str = str;
             this.key = key;
         }
 
-        /*public static Data getRandomData() {
+        public static string GetRandomString() { 
             Random rand = new Random();
             int size = rand.Next(1, 20);
-            StringBuilder result = new StringBuilder();
+            StringBuilder result = new StringBuilder(); 
             for (int i = 0; i < size; i++) {
                 result.Append((char) rand.Next(1, 256));
+
             }
+            
+            return result.ToString();
+        }
 
+        public static string GetRandomKey() {
+            Random rand = new Random();
             int key = rand.Next(1, 256);
-
-            return new Data(result.ToString(), key);
-        }*/
-
-        public static string GetRandomString() {
-           Random rand = new Random();
-           int size = rand.Next(1, 20);
-           StringBuilder result = new StringBuilder();
-           for (int i = 0; i < size; i++) {
-               result.Append((char) rand.Next(1, 256));
-           }
-
-           return result.ToString();
-       }
+            return key.ToString();
+        }
 
         public override string ToString() {
             return "The string is " + this.str + Environment.NewLine + "the key is " + this.key;

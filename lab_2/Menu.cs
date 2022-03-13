@@ -32,11 +32,11 @@ namespace lab_2 {
             Console.WriteLine();
         }
 
-        public void PrintMenu() {
+        public void PrintMenu(string information="data") {
             Console.WriteLine("");
-            Console.WriteLine("Enter 1 to read data from console.");
-            Console.WriteLine("Enter 2 to read data from file.");
-            Console.WriteLine("Enter 3 to set random number.");
+            Console.WriteLine($"Enter 1 to read {information} from console.");
+            Console.WriteLine($"Enter 2 to read {information} from file.");
+            Console.WriteLine($"Enter 3 to set random {information}.");
             Console.WriteLine("Enter 0 to exit.");
         }
 
@@ -54,8 +54,7 @@ namespace lab_2 {
             Console.WriteLine("Enter 2 to choose Caesar cipher");
             Console.WriteLine("Enter 0 to back.");
         }
-
-        public void CipherOperationInterface(ICipher cipher, Data data) {
+        public void CipherOperationInterface(ICipher cipher, string? str) {
             bool isRestart = true;
             do {
                 PrintMenuForOperation();
@@ -65,12 +64,12 @@ namespace lab_2 {
                         isRestart = false;
                         break;
                     case CipherOperationChoice.Encode: {
-                        string result = cipher.Encode(data);
+                        string result = cipher.Encode(str);
                         Console.WriteLine($"The result is {result}");
                         break;
                     }
                     case CipherOperationChoice.Decode: {
-                        string result = cipher.Decode(data);
+                        string result = cipher.Decode(str);
                         Console.WriteLine($"The result is {result}");
                         break;
                     }
@@ -81,6 +80,42 @@ namespace lab_2 {
                                                  $"{(int) CipherOperationChoice.Back} and {(int) CipherOperationChoice.SaveResult}");
                         break;
                 }
+            } while (isRestart);
+        }
+
+        public void KeyChoiceInterface(ICipher cipher, string? str) {
+            bool isRestart = true;
+            do {
+                PrintMenu("key");
+                MenuChoices choice = (MenuChoices) Input.GetNumber();
+                switch (choice) {
+                    case MenuChoices.Exit:
+                        isRestart = false;
+                        break;
+
+                    case MenuChoices.Console: {
+                        Console.WriteLine("Your choice is CONSOLE");
+                        cipher.SetKey();
+                        CipherOperationInterface(cipher, str);
+                    }
+                        break;
+
+                    case MenuChoices.Files:
+                        Console.WriteLine("Your choice is FILES");
+                        break;
+
+                    case MenuChoices.Random: {
+                        Console.WriteLine("Your choice is RANDOM");
+                        cipher.SetKey(true);
+                        CipherOperationInterface(cipher, str);
+                    }
+                        break;
+                    default:
+                        Console.WriteLine($"Please, enter a number between {(int) MenuChoices.Exit} and {(int) MenuChoices.Random}");
+                        continue;
+                }
+
+
             } while (isRestart);
         }
 
@@ -99,7 +134,7 @@ namespace lab_2 {
                         break;
                     case CipherChoice.Caesar:
                         cipher = new CaesarСipher();
-                        //CipherOperationInterface(cipher, data);
+                        KeyChoiceInterface(cipher, str);
                         break;
                     default:
                         Console.WriteLine("Please, enter a number between " +
@@ -114,7 +149,7 @@ namespace lab_2 {
         public void InterfaceMenu() {
             bool isRestart = true;
             do {
-                PrintMenu();
+                PrintMenu("string");
                 MenuChoices choice = (MenuChoices) Input.GetNumber();
                 switch (choice) {
                     case MenuChoices.Exit:
@@ -125,7 +160,7 @@ namespace lab_2 {
 
                     case MenuChoices.Console: {
                         Console.WriteLine("Your choice is CONSOLE");
-                        string? str = Input.getString();
+                        string? str = Input.GetString();
                         CipherChoiceInterface(str);
                     }
                         break;
