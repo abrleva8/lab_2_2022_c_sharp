@@ -3,42 +3,81 @@
 namespace lab_2 {
     public class CaesarСipher : ICipher {
 
-        private int key;
+        private string? key;
+        private string? _message;
 
-        public string Encode(string? str) {
-            key %= 256;
-            StringBuilder result = new StringBuilder();
-            foreach (char ch in str) {
-                int t = (int) ch +key;
-                if (t < 256) {
-                    result.Append((char) t);
-                } else {
-                    result.Append((char) (t - 256));
-                }
-            }
-            return result.ToString();
+        public string Key { get; set; }
+
+        public CaesarСipher(string? message) {
+            this._message = message;
         }
 
-        public string Decode(string? str) {
-            key %= 256;
-            StringBuilder result = new StringBuilder();
-            foreach (char ch in str) {
-                int t = (int) ch - key;
-                if (t >= 0) {
-                    result.Append((char) t);
-                } else {
-                    result.Append((char) (t + 256));
+        public Data? Encode() {
+            if (key != null) {
+                int key = Int32.Parse(this.key);
+                key %= ICipher.MaxCode;
+                StringBuilder result = new StringBuilder();
+                foreach (char ch in this._message!) {
+                    int t = (int) ch + key;
+                    if (t < ICipher.MaxCode) {
+                        result.Append((char) t);
+                    } else {
+                        result.Append((char) (t - ICipher.MaxCode));
+                    }
                 }
+                this._message = result.ToString();
             }
-            return result.ToString();
+
+            return new Data(this._message!, this.key!);
         }
 
-        public void SetKey(bool IsRand = false) {
-            if (IsRand) {
+        public Data? Decode() {
+            if (key != null) {
+                int key = Int32.Parse(this.key);
+                key %= ICipher.MaxCode;
+                StringBuilder result = new StringBuilder();
+                foreach (char ch in this._message!) {
+                    int t = (int) ch - key;
+                    if (t >= 0) {
+                        result.Append((char) t);
+                    } else {
+                        result.Append((char) (t + ICipher.MaxCode));
+                    }
+                }
+                this._message = result.ToString();
+            }
+
+            return new Data(this._message!, this.key!);
+        }
+
+        public void SetKey(bool isRand = false) {
+            int key;
+            if (isRand) {
                 Random random = new Random();
-                this.key = random.Next(255);
+                key = random.Next(ICipher.MaxCode - 1);
             } else {
-                this.key = Input.GetNumber(1, 255);
+                key = Input.GetNumber(1, ICipher.MaxCode - 1);
+            }
+
+            this.key = key.ToString();
+        }
+
+        public string? GetMessage() {
+            return _message;
+        }
+
+        public bool IsGoodKey(string? key) {
+            int iKey;
+            try {
+                iKey = Convert.ToInt32(key);
+            } catch (Exception) {
+                return false;
+            }
+
+            if (iKey > 0) {
+                return true;
+            } else {
+                return false;
             }
         }
     }

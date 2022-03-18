@@ -36,5 +36,16 @@
             return str;
         }
 
+        public static bool IsGoodMessage(string? message) {
+            if (message == null) return true;
+            foreach (char ch in message) {
+                if (ch > 255) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
     }
 }

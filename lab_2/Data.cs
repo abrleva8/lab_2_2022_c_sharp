@@ -2,32 +2,13 @@
 
 namespace lab_2 {
     public class Data {
-        private string str;
-        private string key;
+        public string? Key { get; set; }
 
-        public string Key {
-            get {
-                return this.key;
-            }
+        public string Str { get; set; }
 
-            set {
-                this.key = value;
-            }
-        }
-
-        public string Str {
-            get {
-                return this.str;
-            }
-
-            set {
-                this.str = value;
-            }
-        }
-
-        public Data(string str, string key) {
-            this.str = str;
-            this.key = key;
+        public Data(string str, string? key) {
+            this.Str = str;
+            this.Key = key;
         }
 
         public static string GetRandomString() { 
@@ -49,7 +30,7 @@ namespace lab_2 {
         }
 
         public override string ToString() {
-            return "The string is " + this.str + Environment.NewLine + "the key is " + this.key;
+            return "The message is " + this.Str + Environment.NewLine + "the key is " + this.Key;
         }
     }
 }

@@ -1,9 +1,14 @@
 ﻿namespace lab_2 {
     interface ICipher {
 
-        string Encode(string? str);
-        string Decode(string? str);
+        public static int MaxCode = 256;
+        Data? Encode();
+        Data? Decode();
 
-        void SetKey(bool IsRand = false);
+        void SetKey(bool isRand = false);
+
+        string Key { get; set; }
+        string? GetMessage();
+        bool IsGoodKey(string? key);
     }
 }

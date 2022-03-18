@@ -13,9 +13,9 @@ namespace lab_2.Tests {
         public void EncodeTest() {
             string str = "abcde";
             Data data = new Data(str, 1);
-            string rightAnswer = "bcdef";
+            string? rightAnswer = "bcdef";
             CaesarСipher caesarСipher = new CaesarСipher();
-            string methodAnswer = caesarСipher.Encode(data);
+            string? methodAnswer = caesarСipher.Encode(data);
             Assert.AreEqual(methodAnswer, rightAnswer);
         }
     }
