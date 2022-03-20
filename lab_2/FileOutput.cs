@@ -1,4 +1,6 @@
-﻿namespace lab_2 {
+﻿using System.Text;
+
+namespace lab_2 {
     class FileOutput {
 
         void TryOverwriteFile(ref string? fileName) {
@@ -16,22 +18,22 @@
 
         }
 
-        public void SaveData(string? data) {
-            Console.WriteLine("Do you want to save data to a file? Input please y/n.");
+        public void SaveData(string? data, string dataType="data", bool? IsToByte=false) {
+            Console.WriteLine($"Do you want to save {dataType} to a file? Input please y/n.");
             bool isYes = ConsoleInput.IsChoiceYes();
 
             if (!isYes) return;
-            bool isSuccess = SaveDataToFile(data);
+            bool isSuccess = SaveDataToFile(data, IsToByte);
 
             while (!isSuccess) {
                 Console.WriteLine("The data didn't save! Try again!");
-                isSuccess = SaveDataToFile(data);
+                isSuccess = SaveDataToFile(data, IsToByte);
             }
 
             Console.WriteLine("The data saved successfully!");
         }
 
-        private bool SaveDataToFile(string? data) {
+        private bool SaveDataToFile(string? data, bool? IsToBytes) {
             Console.WriteLine("Please, enter the filename:");
             string? fileName = Console.ReadLine();
             TryOverwriteFile(ref fileName);
@@ -45,13 +47,26 @@
 
             if (fileStream == null) return true;
             using StreamWriter writer = new StreamWriter(fileStream);
-            WriteDateToFile(writer, data);
+            if (IsToBytes == true) {
+                byte[] bytes = Encoding.Default.GetBytes(data);
+                WriteDateToFile(writer, bytes);
+            } else {
+                WriteDateToFile(writer, data);
+            }
+
+            
 
             return true;
         }
 
         private void WriteDateToFile(TextWriter writer, string? data) {
             writer.WriteLine(data);
+        }
+
+        private void WriteDateToFile(TextWriter writer, byte[] data) {
+            foreach (byte b in data) {
+                writer.Write(b + " ");
+            }
         }
     }
 }

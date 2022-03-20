@@ -17,7 +17,6 @@
 
             Console.WriteLine("The file can't be opened");
             return false;
-
         }
 
         public bool Read(ref ICipher iCipher, ref string? key) {
@@ -30,7 +29,7 @@
                     key = data;
                 } else {
                     key = null;
-                    Console.WriteLine("The key is bad. Maybe it is not matched to encoder.");
+                    Console.WriteLine("The key is bad. Maybe it is not matched to the cipher.");
                     return false;
                 }
 

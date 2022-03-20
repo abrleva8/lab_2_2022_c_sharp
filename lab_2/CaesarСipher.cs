@@ -4,12 +4,29 @@ namespace lab_2 {
     public class CaesarСipher : ICipher {
 
         private string? key;
-        private string? _message;
+        private string? message;
 
-        public string Key { get; set; }
+        public string? Key {
+            get {
+                return this.key;
+            }
+            set {
+                this.key = value;
+            }
+        }
+
+        public string? Message {
+            get {
+                return this.message;
+            }
+            set {
+                this.message = value;
+            }
+        }
+
 
         public CaesarСipher(string? message) {
-            this._message = message;
+            this.message = message;
         }
 
         public Data? Encode() {
@@ -17,7 +34,7 @@ namespace lab_2 {
                 int key = Int32.Parse(this.key);
                 key %= ICipher.MaxCode;
                 StringBuilder result = new StringBuilder();
-                foreach (char ch in this._message!) {
+                foreach (char ch in this.message!) {
                     int t = (int) ch + key;
                     if (t < ICipher.MaxCode) {
                         result.Append((char) t);
@@ -25,10 +42,10 @@ namespace lab_2 {
                         result.Append((char) (t - ICipher.MaxCode));
                     }
                 }
-                this._message = result.ToString();
+                this.message = result.ToString();
             }
 
-            return new Data(this._message!, this.key!);
+            return new Data(this.message!, this.key!);
         }
 
         public Data? Decode() {
@@ -36,7 +53,7 @@ namespace lab_2 {
                 int key = Int32.Parse(this.key);
                 key %= ICipher.MaxCode;
                 StringBuilder result = new StringBuilder();
-                foreach (char ch in this._message!) {
+                foreach (char ch in this.message!) {
                     int t = (int) ch - key;
                     if (t >= 0) {
                         result.Append((char) t);
@@ -44,10 +61,10 @@ namespace lab_2 {
                         result.Append((char) (t + ICipher.MaxCode));
                     }
                 }
-                this._message = result.ToString();
+                this.message = result.ToString();
             }
 
-            return new Data(this._message!, this.key!);
+            return new Data(this.message!, this.key!);
         }
 
         public void SetKey(bool isRand = false) {
@@ -62,9 +79,6 @@ namespace lab_2 {
             this.key = key.ToString();
         }
 
-        public string? GetMessage() {
-            return _message;
-        }
 
         public bool IsGoodKey(string? key) {
             int iKey;
@@ -74,11 +88,11 @@ namespace lab_2 {
                 return false;
             }
 
-            if (iKey > 0) {
-                return true;
-            } else {
-                return false;
-            }
+            return iKey > 0;
+        }
+
+        public bool IsGoodDecodingMessage(string? message) {
+            return true;
         }
     }
 }

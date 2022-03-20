@@ -1,5 +1,15 @@
 ﻿namespace lab_2 {
     class Menu {
+
+
+        private byte[] stringToBytes(string str) {
+            byte[] bytes = new byte[str.Length];
+            for (int i = 0; i < str.Length; i++) {
+                bytes[i] = (byte) str[i];
+            }
+
+            return bytes;
+        }
         public enum MenuChoices {
             Exit,
             Console,
@@ -9,7 +19,7 @@
 
         public enum CipherChoice {
             Back,
-            DES,
+            AES,
             Caesar,
         }
 
@@ -26,7 +36,7 @@
                               "The author is Levon Abramyan, Group 404, Course 2nd");
 
             Console.WriteLine("The problem is:");
-            Console.WriteLine("Implement Caesar cipher and DES");
+            Console.WriteLine("Implement Caesar cipher and AES");
             Console.WriteLine();
         }
 
@@ -42,18 +52,19 @@
             Console.WriteLine("");
             Console.WriteLine("Enter 1 to encode data");
             Console.WriteLine("Enter 2 to decode data");
-            Console.WriteLine("Enter 3 to save current key and save");
+            Console.WriteLine("Enter 3 to save result");
             Console.WriteLine("Enter 0 to back.");
         }
 
         public void PrintMenuForChoice() {
             Console.WriteLine("");
-            Console.WriteLine("Enter 1 to choose DES cipher");
+            Console.WriteLine("Enter 1 to choose AES cipher");
             Console.WriteLine("Enter 2 to choose Caesar cipher");
             Console.WriteLine("Enter 0 to back.");
         }
         public void CipherOperationInterface(ICipher cipher) {
             bool isRestart = true;
+            bool? isToByte = null;
             do {
                 PrintMenuForOperation();
                 CipherOperationChoice cipherOperationChoice = (CipherOperationChoice) Input.GetNumber();
@@ -62,28 +73,39 @@
                 switch (cipherOperationChoice) {
                     case CipherOperationChoice.Back: {
                         string? key = cipher.Key;
-                        fo.SaveData(key);
+                        fo.SaveData(key, "key");
                         isRestart = false;
                     }
                         break;
                     case CipherOperationChoice.Encode: {
                         data = cipher.Encode();
+                        isToByte = true;
                         Console.WriteLine(data);
                         break;
                     }
                     case CipherOperationChoice.Decode: {
+                        if (!cipher.IsGoodDecodingMessage(cipher.Message)) {
+                            Console.WriteLine("The message is bad!");
+                            break;
+                        }
                         data = cipher.Decode();
+                        isToByte = false;
                         Console.WriteLine(data);
                         break;
                     }
                     case CipherOperationChoice.SaveResult: {
-                        Console.WriteLine("Saving key");
-                        string? key = cipher.Key;
-                        fo.SaveData(key);
+                        if (isToByte != null) {
+                            string? key = cipher.Key;
+                            Console.WriteLine(key);
+                            fo.SaveData(key, "key");
 
-                        Console.WriteLine("Saving message");
-                        string? message = cipher.GetMessage();
-                        fo.SaveData(message);
+                            string? message = cipher.Message;
+                            Console.WriteLine(message);
+                            fo.SaveData(message, "message", isToByte);
+
+                        } else {
+                            Console.WriteLine("First, you should encoding or decoding the data!");
+                        }
                     }
                         break;
                     default:
@@ -151,11 +173,11 @@
                 switch (cipherChoice) {
                     case CipherChoice.Back:
                         Console.WriteLine("The data will be lost!");
-                        fo.SaveData(message);
+                        fo.SaveData(message, "message");
                         isRestart = false;
                         break;
-                    case CipherChoice.DES:
-                        cipher = new DESCipher(message);
+                    case CipherChoice.AES: 
+                        cipher = new AES(message);
                         KeyChoiceInterface(cipher);
                         break;
                     case CipherChoice.Caesar:
@@ -202,6 +224,10 @@
                         if (isRead) {
                             Console.WriteLine("Message is read");
                             Console.WriteLine($"Message is: {message}");
+                            foreach (byte b in stringToBytes(message)) {
+                                Console.Write(b.ToString("X") + " ");
+                            }
+                            Console.WriteLine();
                         } else {
                             continue;
                         }
