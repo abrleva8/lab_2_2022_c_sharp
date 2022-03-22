@@ -1,14 +1,25 @@
-﻿using System.Security.Cryptography;
-using System.Text;
+﻿using System.Text;
 
 namespace lab_2 {
     public class AES : ICipher{
 
         private string? key;
         private string? message;
-
+        private const int blockSize = 16;
+        private const int blockSize = 4;
+        private const int numberOfRounds = 9;
         public AES(string? message) {
             this.message = message;
+        }
+
+        public string? Key {
+            get => this.key;
+            set => this.key = value;
+        }
+
+        public string? Message {
+            get => this.message;
+            set => this.message = value;
         }
 
         private byte[] sBox = {
@@ -179,19 +190,19 @@ namespace lab_2 {
         };
 
         private void SubBytes(byte[] state) {
-            for (int i = 0; i < 16; i++) {
+            for (int i = 0; i < blockSize; i++) {
                 state[i] = sBox[state[i]];
             }
         }
 
         private void InvSubBytes(byte[] state) {
-            for (int i = 0; i < 16; i++) {
+            for (int i = 0; i < blockSize; i++) {
                 state[i] = sBoxInv[state[i]];
             }
         }
 
         private void ShiftRows(byte[] state) {
-            byte[] tmp = new byte[16];
+            byte[] tmp = new byte[blockSize];
 
             tmp[0] = state[0];
             tmp[1] = state[5];
@@ -213,11 +224,11 @@ namespace lab_2 {
             tmp[14] = state[6];
             tmp[15] = state[11];
 
-            Array.Copy(tmp, state, 16);
+            Array.Copy(tmp, state, blockSize);
         }
 
         private void InvShiftRows(byte[] state) {
-            byte[] tmp = new byte[16];
+            byte[] tmp = new byte[blockSize];
             tmp[0] = state[0];
             tmp[1] = state[13];
             tmp[2] = state[10];
@@ -238,83 +249,57 @@ namespace lab_2 {
             tmp[14] = state[6];
             tmp[15] = state[3];
 
-            Array.Copy(tmp, state, 16);
+            Array.Copy(tmp, state, blockSize);
         }
 
         private void AddRoundKey(byte[] state, byte[] key) {
-            for (int i = 0; i < 16; i++) {
+            for (int i = 0; i < blockSize; i++) {
                 state[i] ^= key[i];
             }
         }
 
         private void MixColumns(byte[] state) {
-            byte[] tmp = new byte[16];
-            tmp[0] = (byte) (mul2[state[0]] ^ mul3[state[1]] ^ state[2] ^ state[3]);
-            tmp[1] = (byte) (state[0] ^ mul2[state[1]] ^ mul3[state[2]] ^ state[3]);
-            tmp[2] = (byte) (state[0] ^ state[1] ^ mul2[state[2]] ^ mul3[state[3]]);
-            tmp[3] = (byte) (mul3[state[0]] ^ state[1] ^ state[2] ^ mul2[state[3]]);
+            byte[] tmp = new byte[blockSize];
+            for (int i = 0; i < blockSize; i += blockRowSize) {
+                tmp[i] = (byte) (mul2[state[i]] ^ mul3[state[i + 1]] ^ state[i + 2] ^ state[i + 3]);
+                tmp[i + 1] = (byte) (state[i] ^ mul2[state[i + 1]] ^ mul3[state[i + 2]] ^ state[i + 3]);
+                tmp[i + 2] = (byte) (state[i] ^ state[i + 1] ^ mul2[state[i + 2]] ^ mul3[state[i + 3]]);
+                tmp[i + 3] = (byte) (mul3[state[i]] ^ state[i + 1] ^ state[i + 2] ^ mul2[state[i + 3]]);
+            }
 
-            tmp[4] = (byte) (mul2[state[4]] ^ mul3[state[5]] ^ state[6] ^ state[7]);
-            tmp[5] = (byte) (state[4] ^ mul2[state[5]] ^ mul3[state[6]] ^ state[7]);
-            tmp[6] = (byte) (state[4] ^ state[5] ^ mul2[state[6]] ^ mul3[state[7]]);
-            tmp[7] = (byte) (mul3[state[4]] ^ state[5] ^ state[6] ^ mul2[state[7]]);
-
-            tmp[8] = (byte) (mul2[state[8]] ^ mul3[state[9]] ^ state[10] ^ state[11]);
-            tmp[9] = (byte) (state[8] ^ mul2[state[9]] ^ mul3[state[10]] ^ state[11]);
-            tmp[10] = (byte) (state[8] ^ state[9] ^ mul2[state[10]] ^ mul3[state[11]]);
-            tmp[11] = (byte) (mul3[state[8]] ^ state[9] ^ state[10] ^ mul2[state[11]]);
-
-            tmp[12] = (byte) (mul2[state[12]] ^ mul3[state[13]] ^ state[14] ^ state[15]);
-            tmp[13] = (byte) (state[12] ^ mul2[state[13]] ^ mul3[state[14]] ^ state[15]);
-            tmp[14] = (byte) (state[12] ^ state[13] ^ mul2[state[14]] ^ mul3[state[15]]);
-            tmp[15] = (byte) (mul3[state[12]] ^ state[13] ^ state[14] ^ mul2[state[15]]);
-
-            Array.Copy(tmp, state, 16);
+            Array.Copy(tmp, state, blockSize);
         }
 
         private void InvMixColumns(byte[] state) {
-            byte[] tmp = new byte[16];
-            tmp[0] = (byte) (mul14[state[0]] ^ mul11[state[1]] ^ mul13[state[2]] ^ mul9[state[3]]);
-            tmp[1] = (byte) (mul9[state[0]] ^ mul14[state[1]] ^ mul11[state[2]] ^ mul13[state[3]]);
-            tmp[2] = (byte) (mul13[state[0]] ^ mul9[state[1]] ^ mul14[state[2]] ^ mul11[state[3]]);
-            tmp[3] = (byte) (mul11[state[0]] ^ mul13[state[1]] ^ mul9[state[2]] ^ mul14[state[3]]);
+            byte[] tmp = new byte[blockSize];
+            for (int i = 0; i < blockSize; i += blockRowSize) {
+                tmp[i] = (byte) (mul14[state[i]] ^ mul11[state[i + 1]] ^ mul13[state[i + 2]] ^ mul9[state[i + 3]]);
+                tmp[i + 1] = (byte) (mul9[state[i]] ^ mul14[state[i + 1]] ^ mul11[state[i + 2]] ^ mul13[state[i + 3]]);
+                tmp[i + 2] = (byte) (mul13[state[i]] ^ mul9[state[i + 1]] ^ mul14[state[i + 2]] ^ mul11[state[i + 3]]);
+                tmp[i + 3] = (byte) (mul11[state[i]] ^ mul13[state[i + 1]] ^ mul9[state[i + 2]] ^ mul14[state[i + 3]]);
+            }
 
-            tmp[4] = (byte) (mul14[state[4]] ^ mul11[state[5]] ^ mul13[state[6]] ^ mul9[state[7]]);
-            tmp[5] = (byte) (mul9[state[4]] ^ mul14[state[5]] ^ mul11[state[6]] ^ mul13[state[7]]);
-            tmp[6] = (byte) (mul13[state[4]] ^ mul9[state[5]] ^ mul14[state[6]] ^ mul11[state[7]]);
-            tmp[7] = (byte) (mul11[state[4]] ^ mul13[state[5]] ^ mul9[state[6]] ^ mul14[state[7]]);
-
-            tmp[8] = (byte) (mul14[state[8]] ^ mul11[state[9]] ^ mul13[state[10]] ^ mul9[state[11]]);
-            tmp[9] = (byte) (mul9[state[8]] ^ mul14[state[9]] ^ mul11[state[10]] ^ mul13[state[11]]);
-            tmp[10] = (byte) (mul13[state[8]] ^ mul9[state[9]] ^ mul14[state[10]] ^ mul11[state[11]]);
-            tmp[11] = (byte) (mul11[state[8]] ^ mul13[state[9]] ^ mul9[state[10]] ^ mul14[state[11]]);
-
-            tmp[12] = (byte) (mul14[state[12]] ^ mul11[state[13]] ^ mul13[state[14]] ^ mul9[state[15]]);
-            tmp[13] = (byte) (mul9[state[12]] ^ mul14[state[13]] ^ mul11[state[14]] ^ mul13[state[15]]);
-            tmp[14] = (byte) (mul13[state[12]] ^ mul9[state[13]] ^ mul14[state[14]] ^ mul11[state[15]]);
-            tmp[15] = (byte) (mul11[state[12]] ^ mul13[state[13]] ^ mul9[state[14]] ^ mul14[state[15]]);
-
-            Array.Copy(tmp, state, 16);
+            Array.Copy(tmp, state, blockSize);
         }
 
         private void KeyExpansion(byte[] inputKey, byte[] expandedKeys) {
-            Array.Copy(inputKey, expandedKeys, 16);
+            Array.Copy(inputKey, expandedKeys, blockSize);
 
-            int bytesGenerated = 16;
+            int bytesGenerated = blockSize;
             byte rConIteration = 1;
-            byte[] tmp = new byte[4];
+            byte[] tmp = new byte[blockRowSize];
 
-            while (bytesGenerated < 176) {
-                for (int i = 0; i < 4; i++) {
-                    tmp[i] = expandedKeys[i + bytesGenerated - 4];
+            while (bytesGenerated < blockSize * (numberOfRounds + 2)) {
+                for (int i = 0; i < blockRowSize; i++) {
+                    tmp[i] = expandedKeys[i + bytesGenerated - blockRowSize];
                 }
 
-                if (bytesGenerated % 16 == 0) {
+                if (bytesGenerated % blockSize == 0) {
                     KeyExpansionCore(tmp, rConIteration++);
                 }
 
-                for (byte b = 0; b < 4; b++) {
-                    expandedKeys[bytesGenerated] = (byte) (expandedKeys[bytesGenerated - 16] ^ tmp[b]);
+                for (byte b = 0; b < blockRowSize; b++) {
+                    expandedKeys[bytesGenerated] = (byte) (expandedKeys[bytesGenerated - blockSize] ^ tmp[b]);
                     bytesGenerated++;
                 }
             }
@@ -327,7 +312,7 @@ namespace lab_2 {
             input[2] = input[3];
             input[3] = tmp;
 
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < blockRowSize; i++) {
                 input[i] = sBox[input[i]];
             }
 
@@ -338,8 +323,8 @@ namespace lab_2 {
             int originalLen = message.Length;
             int lenOfPaddedMessage = originalLen;
 
-            if (lenOfPaddedMessage % 16 != 0) {
-                lenOfPaddedMessage = (lenOfPaddedMessage / 16 + 1) * 16;
+            if (lenOfPaddedMessage % blockSize != 0) {
+                lenOfPaddedMessage = (lenOfPaddedMessage / blockSize + 1) * blockSize;
             }
 
             byte[] messageCopy = new byte[lenOfPaddedMessage];
@@ -353,81 +338,40 @@ namespace lab_2 {
             }
 
             List<byte[]> paddedMessage = new List<byte[]>();
-            for (int i = 0; i < lenOfPaddedMessage; i += 16) {
-                byte[] xxx = new byte[16];
-                Array.Copy(messageCopy, i, xxx, 0, 16);
-                paddedMessage.Add(xxx);
+            for (int i = 0; i < lenOfPaddedMessage; i += blockSize) {
+                byte[] tmp = new byte[blockSize];
+                Array.Copy(messageCopy, i, tmp, 0, blockSize);
+                paddedMessage.Add(tmp);
             }
 
             return paddedMessage;
         }
 
-
-        public string? Key {
-            get {
-                return this.key;
-            }
-            set {
-                this.key = value;
-            }
-        }
-
-        public string? Message {
-            get {
-                return this.message;
-            }
-            set {
-                this.message = value;
-            }
-        }
-
-        private byte[] stringToBytes(string str) {
-            byte[] bytes = new byte[str.Length];
-            for (int i = 0; i < str.Length; i++) {
-                bytes[i] = (byte) str[i];
-            }
-
-            return bytes;
-        }
-
-        private string BytesToString(byte[] bytes) {
-            StringBuilder sb = new StringBuilder();
-            foreach (byte b in bytes) {
-                sb.Append((char) b);
-            }
-
-            return sb.ToString();
-        }
-
         public Data Encode() {
             List<byte[]> result = new List<byte[]>();
-            List<byte[]> paddedMessage = SplittingMessage(stringToBytes(message));
+            List<byte[]> paddedMessage = SplittingMessage(BytesWorker.StringToBytes(message));
             foreach (byte[] bytes in paddedMessage) {
-                EncodeBlock(bytes, stringToBytes(key));
+                EncodeBlock(bytes, BytesWorker.StringToBytes(key));
                 result.Add(bytes);
             }
 
             StringBuilder sb = new StringBuilder();
             foreach (byte[] bytes in result) {
-                sb.Append(BytesToString(bytes));
+                sb.Append(BytesWorker.BytesToString(bytes));
             }
 
             message = sb.ToString();
-            foreach (byte b in stringToBytes(message)) {
-                Console.Write(b.ToString("X") + " ");
-            }
-            Console.WriteLine();
+           
             return new Data(message, key);
         }
 
         private void EncodeBlock(byte[] message, byte[] key) {
 
-            byte[] state = new byte[16];
+            byte[] state = new byte[blockSize];
 
-            Array.Copy(message, state, 16);
+            Array.Copy(message, state, blockSize);
 
-            int numberOfRounds = 9;
-            byte[] expandedKeys = new byte[176];
+            byte[] expandedKeys = new byte[blockSize * (numberOfRounds + 2)];
             KeyExpansion(key, expandedKeys);
             AddRoundKey(state, key);
 
@@ -435,94 +379,100 @@ namespace lab_2 {
                 SubBytes(state);
                 ShiftRows(state);
                 MixColumns(state);
-                AddRoundKey(state, expandedKeys[(16 * (i + 1))..(16 * (i + 2))]);
+                AddRoundKey(state, expandedKeys[(blockSize * (i + 1))..(blockSize * (i + 2))]);
             }
 
             SubBytes(state);
             ShiftRows(state);
-            AddRoundKey(state, expandedKeys[160..]);
-            Array.Copy(state, message, 16);
+            AddRoundKey(state, expandedKeys[(blockSize * (numberOfRounds + 1))..]);
+            Array.Copy(state, message, blockSize);
         }
 
 
         public Data? Decode() {
             List<byte[]> ByteMessage = new List<byte[]>();
             List<byte[]> result = new List<byte[]>();
-            int size = message.Length / 16;
-            int sizeOfLast = message.Length % 16;
-            for (int i = 0; i < size; i++) {
-                string tmp = message.Substring(16 * i, 16);
-                byte[] tmpBytes = stringToBytes(tmp);
-                ByteMessage.Add(tmpBytes);
-            }
+            if (message != null) {
+                int size = message.Length / blockSize;
+                int sizeOfLast = message.Length % blockSize;
+           
+                for (int i = 0; i < size; i++) {
+                    string? tmp = message.Substring(blockSize * i, blockSize);
+                    byte[] tmpBytes = BytesWorker.StringToBytes(tmp);
+                    ByteMessage.Add(tmpBytes);
+                }
 
-            if (sizeOfLast > 0) {
-                string tmp = message.Substring(16 * size,  sizeOfLast);
-                byte[] tmpBytes = stringToBytes(tmp);
-                ByteMessage.Add(tmpBytes);
+                if (sizeOfLast > 0) {
+                    string? tmp = message.Substring(blockSize * size,  sizeOfLast);
+                    while (tmp.Length < blockSize) {
+                        tmp += (char) 0;
+                    }
+                    byte[] tmpBytes = BytesWorker.StringToBytes(tmp);
+                    ByteMessage.Add(tmpBytes);
+                }
             }
 
             foreach(byte[] bytes in ByteMessage) {
-                DecodeBlock(bytes, stringToBytes(key));
+                DecodeBlock(bytes, BytesWorker.StringToBytes(key));
                 result.Add(bytes);
             }
             StringBuilder sb = new StringBuilder();
             foreach (byte[] bytes in result) {
-                sb.Append(BytesToString(bytes));
+                sb.Append(BytesWorker.BytesToString(bytes));
             }
 
             message = sb.ToString();
-            foreach (byte b in stringToBytes(message)) {
-                Console.Write(b.ToString("X") + " ");
-            }
-            Console.WriteLine();
             return new Data(message, key);
         }
 
         public void DecodeBlock(byte[] message, byte[] key) {
-            byte[] state = new byte[16];
-            Array.Copy(message, state, 16);
-            int numberOfRounds = 9;
-            byte[] expandedKeys = new byte[176];
+            byte[] state = new byte[blockSize];
+            Array.Copy(message, state, message.Length);
+            
+            for (int i = message.Length; i < blockSize; i++) {
+                state[i] = 0;
+            }
+
+            byte[] expandedKeys = new byte[blockSize * (numberOfRounds + 2)];
             KeyExpansion(key, expandedKeys);
-            AddRoundKey(state, expandedKeys[160..]);
+            AddRoundKey(state, expandedKeys[(blockSize * (numberOfRounds + 1))..]);
 
             for (int i = numberOfRounds; i > 0; i--) {
                 InvShiftRows(state);
                 InvSubBytes(state);
-                AddRoundKey(state, expandedKeys[(16 * i)..(16 * (i + 1))]);
+                AddRoundKey(state, expandedKeys[(blockSize * i)..(blockSize * (i + 1))]);
                 InvMixColumns(state);
             }
 
             InvShiftRows(state);
             InvSubBytes(state);
             AddRoundKey(state, key);
-            Array.Copy(state, message, 16);
+            Array.Copy(state, message, blockSize);
         }
 
         public void SetKey(bool isRand = false) {
-            do {
-                Console.WriteLine("Enter the key. The string size should be 16 and the code of each symbol should be less than 255");
-                key = Console.ReadLine();
-            } while (!IsGoodKey(key));
+            if (isRand) {
+                StringBuilder sb = new StringBuilder();
+                Random random = new Random();
+                for (int _ = 0; _ < blockSize; _++) {
+                    int iChar = random.Next(ICipher.maxCode);
+                    sb.Append((char) iChar);
+                }
+                key = sb.ToString();
+            } else {
+                do {
+                    Console.WriteLine("Enter the key. The string size should be less than 16 and the code of each symbol should be less than 256");
+                    key = Console.ReadLine();
+                } while (!IsGoodKey(key));
+
+                while (key != null && key.Length < blockSize) {
+                    key += (char) 0;
+                }
+            }
         }
 
         public bool IsGoodKey(string? key) {
-            if (key!.Length != 16) {
-                return false;
-            }
-
-            foreach (char ch in key) {
-                if (ch > 255) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        public bool IsGoodDecodingMessage(string? message) {
-            return message.Length % 16 == 0;
+            return key != null && key.Length <= blockSize && Input.IsGoodMessage(key);
         }
     }
 }

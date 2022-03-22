@@ -1,15 +1,5 @@
 ﻿namespace lab_2 {
     class Menu {
-
-
-        private byte[] stringToBytes(string str) {
-            byte[] bytes = new byte[str.Length];
-            for (int i = 0; i < str.Length; i++) {
-                bytes[i] = (byte) str[i];
-            }
-
-            return bytes;
-        }
         public enum MenuChoices {
             Exit,
             Console,
@@ -31,7 +21,7 @@
         }
 
         public void Greeting() {
-            Console.WriteLine("This is the second laboratory task of the first variation. " +
+            Console.WriteLine("This is the first variation of the second laboratory task" +
                               Environment.NewLine +
                               "The author is Levon Abramyan, Group 404, Course 2nd");
 
@@ -80,27 +70,23 @@
                     case CipherOperationChoice.Encode: {
                         data = cipher.Encode();
                         isToByte = true;
-                        Console.WriteLine(data);
+                        BytesWorker.DisplayBytes(data!.Str, "message");
                         break;
                     }
                     case CipherOperationChoice.Decode: {
-                        if (!cipher.IsGoodDecodingMessage(cipher.Message)) {
-                            Console.WriteLine("The message is bad!");
-                            break;
-                        }
                         data = cipher.Decode();
                         isToByte = false;
-                        Console.WriteLine(data);
+                        BytesWorker.DisplayBytes(data!.Str, "message");
                         break;
                     }
                     case CipherOperationChoice.SaveResult: {
                         if (isToByte != null) {
                             string? key = cipher.Key;
-                            Console.WriteLine(key);
-                            fo.SaveData(key, "key");
+
+                            fo.SaveData(key, "key", isToByte);
 
                             string? message = cipher.Message;
-                            Console.WriteLine(message);
+
                             fo.SaveData(message, "message", isToByte);
 
                         } else {
@@ -123,12 +109,14 @@
                 MenuChoices choice = (MenuChoices) Input.GetNumber();
                 switch (choice) {
                     case MenuChoices.Exit:
+                        Console.WriteLine("Your choice is back!");
                         isRestart = false;
                         break;
 
                     case MenuChoices.Console: {
                         Console.WriteLine("Your choice is CONSOLE");
                         cipher.SetKey();
+                        Console.WriteLine($"Key is {cipher.Key}");
                         CipherOperationInterface(cipher);
                     }
                         break;
@@ -151,6 +139,7 @@
                     case MenuChoices.Random: {
                         Console.WriteLine("Your choice is RANDOM");
                         cipher.SetKey(true);
+                        Console.WriteLine($"Key is {cipher.Key}");
                         CipherOperationInterface(cipher);
                     }
                         break;
@@ -176,11 +165,13 @@
                         fo.SaveData(message, "message");
                         isRestart = false;
                         break;
-                    case CipherChoice.AES: 
+                    case CipherChoice.AES:
+                        Console.WriteLine("Your choice is AES");
                         cipher = new AES(message);
                         KeyChoiceInterface(cipher);
                         break;
                     case CipherChoice.Caesar:
+                        Console.WriteLine("Your choice is Caesar");
                         cipher = new CaesarСipher(message);
                         KeyChoiceInterface(cipher);
                         break;
@@ -212,7 +203,7 @@
                         do {
                             message = Input.GetString();}
                         while (!Input.IsGoodMessage(message));
-
+                        Console.WriteLine($"Message is {message}");
                         CipherChoiceInterface(message);
                     }
                         break;
@@ -224,10 +215,6 @@
                         if (isRead) {
                             Console.WriteLine("Message is read");
                             Console.WriteLine($"Message is: {message}");
-                            foreach (byte b in stringToBytes(message)) {
-                                Console.Write(b.ToString("X") + " ");
-                            }
-                            Console.WriteLine();
                         } else {
                             continue;
                         }

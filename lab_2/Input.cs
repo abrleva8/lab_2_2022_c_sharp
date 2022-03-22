@@ -1,5 +1,7 @@
 ﻿namespace lab_2 {
     class Input {
+
+        private const int maxCode = 256;
         public static int GetNumber() {
             int num = 0;
             while (true) {
@@ -30,22 +32,16 @@
            return str;
         }
 
-        public static string? GetKey() {
-            Console.WriteLine("Enter a string for encoding or decoding");
-            string? str = Console.ReadLine();
-            return str;
-        }
-
         public static bool IsGoodMessage(string? message) {
             if (message == null) return true;
             foreach (char ch in message) {
-                if (ch > 255) {
-                    return false;
-                }
+                if (ch <= maxCode) continue;
+                Console.WriteLine("The ASCII code of each symbol should be less than 256");
+                Console.WriteLine();
+                return false;
             }
-
+            
             return true;
         }
-
     }
 }

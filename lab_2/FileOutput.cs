@@ -48,8 +48,10 @@ namespace lab_2 {
             if (fileStream == null) return true;
             using StreamWriter writer = new StreamWriter(fileStream);
             if (IsToBytes == true) {
-                byte[] bytes = Encoding.Default.GetBytes(data);
-                WriteDateToFile(writer, bytes);
+                if (data != null) {
+                    byte[] bytes = Encoding.Default.GetBytes(data);
+                    WriteDateToFile(writer, bytes);
+                }
             } else {
                 WriteDateToFile(writer, data);
             }
@@ -65,7 +67,7 @@ namespace lab_2 {
 
         private void WriteDateToFile(TextWriter writer, byte[] data) {
             foreach (byte b in data) {
-                writer.Write(b + " ");
+                writer.Write(b.ToString("X") + " ");
             }
         }
     }

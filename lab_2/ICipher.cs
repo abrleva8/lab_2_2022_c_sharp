@@ -1,7 +1,8 @@
 ﻿namespace lab_2 {
-    interface ICipher {
+    public interface ICipher {
 
-        public static int MaxCode = 256;
+        public static int maxCode = 256;
+        public static int minCode = 0;
         Data? Encode();
         Data? Decode();
 
@@ -11,9 +12,5 @@
         string? Message { set; get; }
 
         bool IsGoodKey(string? key);
-
-        bool IsGoodDecodingMessage(string? message) {
-            return true;
-        }
     }
 }
