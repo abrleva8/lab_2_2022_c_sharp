@@ -52,7 +52,7 @@
             Console.WriteLine("Enter 2 to choose Caesar cipher");
             Console.WriteLine("Enter 0 to back.");
         }
-        public void CipherOperationInterface(ICipher cipher) {
+        public void CipherOperationInterface(ICipher? cipher) {
             bool isRestart = true;
             bool? isToByte = null;
             do {
@@ -62,33 +62,28 @@
                 Data? data = null;
                 switch (cipherOperationChoice) {
                     case CipherOperationChoice.Back: {
-                        string? key = cipher.Key;
-                        fo.SaveData(key, "key");
                         isRestart = false;
                     }
                         break;
                     case CipherOperationChoice.Encode: {
-                        data = cipher.Encode();
+                        data = cipher!.Encode();
                         isToByte = true;
+                        Console.WriteLine(data!.Str);
                         BytesWorker.DisplayBytes(data!.Str, "message");
                         break;
                     }
                     case CipherOperationChoice.Decode: {
-                        data = cipher.Decode();
+                        data = cipher!.Decode();
                         isToByte = false;
+                        Console.WriteLine(data!.Str);
                         BytesWorker.DisplayBytes(data!.Str, "message");
                         break;
                     }
+                   
                     case CipherOperationChoice.SaveResult: {
                         if (isToByte != null) {
-                            string? key = cipher.Key;
-
-                            fo.SaveData(key, "key", isToByte);
-
-                            string? message = cipher.Message;
-
-                            fo.SaveData(message, "message", isToByte);
-
+                            string? message = cipher?.Message;
+                            fo.SaveData(message, "message");
                         } else {
                             Console.WriteLine("First, you should encoding or decoding the data!");
                         }
@@ -102,7 +97,7 @@
             } while (isRestart);
         }
 
-        public void KeyChoiceInterface(ICipher cipher) {
+        public void KeyChoiceInterface(ICipher? cipher) {
             bool isRestart = true;
             do {
                 PrintMenu("key", "back");
@@ -115,9 +110,7 @@
 
                     case MenuChoices.Console: {
                         Console.WriteLine("Your choice is CONSOLE");
-                        cipher.SetKey();
-                        Console.WriteLine($"Key is {cipher.Key}");
-                        CipherOperationInterface(cipher);
+                        cipher?.SetKey();
                     }
                         break;
 
@@ -126,21 +119,17 @@
                         FileInput fileInput = new FileInput();
                         string? key = null;
                         bool isRead = fileInput.Read(ref cipher, ref key);
-                        cipher.Key = key;
+                        cipher?.SetKey(true);
                         if (isRead) {
                             Console.WriteLine("Key is read.");
-                            Console.WriteLine($"Key is {key}");
                         } else {
                             continue;
                         }
-                        CipherOperationInterface(cipher);
                         break;
 
                     case MenuChoices.Random: {
                         Console.WriteLine("Your choice is RANDOM");
-                        cipher.SetKey(true);
-                        Console.WriteLine($"Key is {cipher.Key}");
-                        CipherOperationInterface(cipher);
+                        cipher?.SetKey(true);
                     }
                         break;
                     default:
@@ -148,16 +137,19 @@
                         continue;
                 }
 
+                if (choice == MenuChoices.Exit) continue;
+                Console.WriteLine($"Key is {cipher?.Key}");
+                CipherOperationInterface(cipher);
 
             } while (isRestart);
         }
 
         public void CipherChoiceInterface(string? message) {
             bool isRestart = true;
+            ICipher? cipher = null;
             do {
                 PrintMenuForChoice();
                 CipherChoice cipherChoice = (CipherChoice) Input.GetNumber();
-                ICipher cipher;
                 FileOutput fo = new FileOutput();
                 switch (cipherChoice) {
                     case CipherChoice.Back:
@@ -168,12 +160,11 @@
                     case CipherChoice.AES:
                         Console.WriteLine("Your choice is AES");
                         cipher = new AES(message);
-                        KeyChoiceInterface(cipher);
+                        
                         break;
                     case CipherChoice.Caesar:
                         Console.WriteLine("Your choice is Caesar");
                         cipher = new CaesarСipher(message);
-                        KeyChoiceInterface(cipher);
                         break;
                     default:
                         Console.WriteLine("Please, enter a number between " +
@@ -182,6 +173,8 @@
 
 
                 }
+                if (cipherChoice == CipherChoice.Back) continue;
+                KeyChoiceInterface(cipher);
             } while (isRestart);
         }
         
@@ -204,7 +197,7 @@
                             message = Input.GetString();}
                         while (!Input.IsGoodMessage(message));
                         Console.WriteLine($"Message is {message}");
-                        CipherChoiceInterface(message);
+                        
                     }
                         break;
 
@@ -218,8 +211,6 @@
                         } else {
                             continue;
                         }
-
-                        CipherChoiceInterface(message);
                     }
                         break;
 
@@ -227,13 +218,13 @@
                         Console.WriteLine("Your choice is RANDOM");
                         message = Data.GetRandomString();
                         Console.WriteLine(message);
-                        CipherChoiceInterface(message);
                     }
                         break;
                     default:
                         Console.WriteLine($"Please, enter a number between {(int) MenuChoices.Exit} and {(int) MenuChoices.Random}");
                         continue;
                 }
+                CipherChoiceInterface(message);
             } while (isRestart);
         }
     }

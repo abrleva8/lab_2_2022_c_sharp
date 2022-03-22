@@ -6,7 +6,7 @@ namespace lab_2 {
         private string? key;
         private string? message;
         private const int blockSize = 16;
-        private const int blockSize = 4;
+        private const int blockRowSize = 4;
         private const int numberOfRounds = 9;
         public AES(string? message) {
             this.message = message;
@@ -348,6 +348,7 @@ namespace lab_2 {
         }
 
         public Data Encode() {
+            
             List<byte[]> result = new List<byte[]>();
             List<byte[]> paddedMessage = SplittingMessage(BytesWorker.StringToBytes(message));
             foreach (byte[] bytes in paddedMessage) {

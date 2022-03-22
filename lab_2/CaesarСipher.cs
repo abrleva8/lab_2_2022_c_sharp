@@ -6,6 +6,8 @@ namespace lab_2 {
         private string? key;
         private string? message;
 
+        
+
         public string? Key {
             get => this.key;
             set => this.key = value;
@@ -20,7 +22,7 @@ namespace lab_2 {
         public CaesarСipher(string? message) {
             this.message = message;
         }
-
+        
         public Data? Encode() {
             if (key != null) {
                 int key = Int32.Parse(this.key);

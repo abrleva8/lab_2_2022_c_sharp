@@ -19,7 +19,7 @@
             return false;
         }
 
-        public bool Read(ref ICipher iCipher, ref string? key) {
+        public bool Read(ref ICipher? iCipher, ref string? key) {
             Console.WriteLine("Enter the filepath please:");
             string? filePath = Console.ReadLine();
             Console.WriteLine(filePath);
